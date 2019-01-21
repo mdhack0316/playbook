@@ -1,0 +1,41 @@
+---
+ - hosts: localhost
+   tasks: 
+    - name: insatlling required packages
+      yum: name={{ item }} state=present
+      with_items: 
+       - httpd
+       - dhcp
+       - tftp-server 
+       - syslinux 
+       - xinetd
+
+     - name: making two directories
+       file: path=/var/www/html/{{ item }} state=directory
+       with_items: 
+        - rhel75 
+        - kickstart
+
+     - name: downloading iso image
+       get_url: url=ftp://192.168.10.254/pub/os-images/rhel-server-7.5-x86_64-dvd.iso dest=/root/Downloads/
+
+     - name: mounting redhat iso in html/rhel75
+       shell: mount -t iso9660 -o loop,/root/Downloads/rhel-server-7.5-x86_64-dvd.iso  /var/www/html/rhel75
+
+     - name: changes in anaconda file
+       copy: src=/root/main.cfg  dest=/var/www/html/kickstart/
+     - copy: src=/usr/share/syslinux/*  dest=/var/lib/tftpboot/*
+     - file: path=/var/lib/tftpboot/{{ item }} state=directory
+       with_items: 
+        - rhel75
+        - pxelinux.cfg
+
+     - name: copying two files in rhel75 directory 
+       copy: src=/var/www/html/rhel75/images/pxeboot/{{ item }}  dest=/var/lib/tftpboot/rhel75/
+       with_items: 
+        - initrd.img
+        - vmlinuz
+
+     - name: making default file in pxelinux.cfg 
+       file: path=/var/lib/tftpboot/pxelinux.cfg/default state=touch 
+

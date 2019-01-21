@@ -1,0 +1,12 @@
+--- 
+ - hosts: vm1
+   tasks: 
+    - yum: name={{ item }} state=present
+      with_items: 
+       - bash-completion 
+       - vim*
+       - net-tools
+    - copy: path=/root/playbooks/bigdata/core-site.xml   dest=/hadoop2/etc/hadoop/
+    - copy: path=/root/playbooks/bigdata/hadoop-env.sh   dest=/hadoop2/etc/hadoop/
+    - copy: path=/root/playbooks/bigdata/hdfs-site1.xml   dest=/hadoop2/etc/hadoop/hdfs-site.yml
+    - shell: hadoop-daemon.sh start datanode

@@ -1,0 +1,104 @@
+---
+ - hosts: all
+   ignore_errors: yes
+   tasks: 
+    - shell: cat /etc/yum.repos.d/adhoc.repo
+      register: a
+    - debug: var=a
+
+    - shell: ifconfig
+      register: b
+    - debug: var=b
+
+    - shell: hostname
+      register: c
+    - debug: var=c
+
+    - shell: lvdisplay
+      register: d
+    - debug: var=d
+
+    - shell: vgdisplay
+      register: e
+    - debug: var=e
+
+    - shell: cat /etc/passwd
+      register: f
+    - debug: var=f
+
+    - shell: cat /etc/group
+      register: g
+    - debug: var=g
+
+    - shell: ls -l 
+      register: h
+    - debug: var=h
+
+    - shell: crontab -u harry -l 
+      register: f
+    - debug: var=f
+
+    - shell: cat /etc/rc.local
+      register: g
+    - debug: var=g
+
+    - shell: getfacl /var/tmp/fstab
+      register: h
+    - debug: var=h
+
+
+    - shell: history
+      register: i
+    - debug: var=i
+
+    - shell: ls -l /common/adm
+      register: j
+    - debug: var=j
+
+    - shell: getenforce
+      register: k
+    - debug: var=k
+
+    - shell: cat /etc/sysctl.conf
+      register: l
+    - debug: var=l
+
+    - shell: ls 
+      register: m
+    - debug: var=m
+
+    - shell: cat /root/lines.txt 
+      register: n
+    - debug: var=n
+
+    - shell: cd /root/found/
+      register: o
+    - debug: var=o
+
+    - shell: free -m
+      register: p
+    - debug: var=p
+
+    - shell: cat /etc/fstab
+      register: q
+    - debug: var=q
+
+    - shell: cat /etc/auto.misc
+      register: r
+    - debug: var=r
+
+    - shell: cat /etc/auto.master
+      register: s
+    - debug: var=s
+
+    - shell: systemctel status autofs
+      register: t
+    - debug: var=t
+
+    - shell: systemctl status ntpd
+      register: u
+    - debug: var=u
+
+    - shell: systemctl status crond
+      register: v
+    - debug: var=v

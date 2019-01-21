@@ -1,0 +1,124 @@
+Ansible file microsoft.yml ::
+
+Set hosts: localhost
+connection: local
+
+Create resource group  using module azure_rm_resource and name it whatever you like. 
+
+Set name to <microsource or any value> and location to < eastus> 
+-----------------------------------------------------------------------------------------
+
+Create virtual network using module azure_rm_virtualnetwork 
+
+       resource_group: microsource
+       name: microsoft_vnet
+       address_prefixes_cidr: "10.0.0.0/16"
+
+-----------------------------------------------------------------------------------------
+
+Create subnet using module azure_rm_subnet
+
+       resource_group: microsource
+       name: microsoft_subnet
+       address_prefix: "10.0.1.0/24"
+       virtual_network: microsoft_vnet
+
+----------------------------------------------------------------------------------------
+
+Create publicipaddress using azure_rm_publicipaddress
+
+       resource_group: microsource
+       allocation_method: Static
+       name: microsoft_public_ip
+      register: exam
+
+Then dump the IP address using the "state.ip_address", so exam.state.ip_address
+
+------------------------------------------------------------------------------------------
+
+Create network security group using module azure_rm_securitygroup
+
+       resource_group: microsource
+       name: microsoft_securitygroup
+       rules:
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 1001
+          direction: Inbound
+
+-----------------------------------------------------------------------------------------
+
+Create virtual NIC using azure_rm_virtualmachine
+
+       resource_group: microsource
+       name: nic
+       virtual_network: microsoft_vnet
+       subnet: microsoft_subnet
+       public_ip_name: microsoft_public_ip
+       security_group: microsoft_securitygroup
+
+----------------------------------------------------------------------------------------
+
+Create VM using azure_rm_virtualmachine
+
+      azure_rm_virtualmachine:
+       resource_group: microsource
+       name: myvm
+       vm_size: Standard_DS1_v2 < can be others too >
+       admin_username: azureuser
+       ssh_password_enabled: True < Also can be set to false and then makle use of ssh keys >
+
+       admin_password: <any value must be of 12 characters or more and contains special character and Capitals >
+       network_interfaces: nic
+       image:
+        offer: CentOS
+        publisher: OpenLogic
+        sku: '7.5'
+        version: latest
+
+--------------------------------------------------------------------------------------------
+
+Now for authentication, create /home/<username>/.azure/credentials
+
+In credentials file, we need to write the following options : 
+
+[default]
+subscription_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+client_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+secret=xxxxxxxxxxxxxxxxx
+tenant=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+Here, subscription id is simple id of your subscription.
+
+For client id, go to Azure Active directory > App regsitration > New Applicaiton registration > 
+then Name : < any value, let it be "hello" > 
+     Application type : Webapp/API
+     Sign on URL : < Let http://test.in will work > 
+     
+Then save it.
+After saving it, an application id is shown that id is client_id 
+
+On that screen after getting application id, go to settings > Keys > 
+We have three columns namely Description, expires, value 
+
+Write any name in description and set expires to 1 year or never. 
+Then save it and after saving it value will be shown in 'value' column. 
+
+Copy it and paste it in secret attribute in credentials file as this is secret value.
+
+Now To assign the applicaiton to a role
+GO to All Services > Subscription  > Select your subscription > Access control ( IAM ) > add role assignment > 
+Select role as contributor 
+Assign access to Azure AD user, group or service principal 
+Select value to name of applicaiton whatever you assign it. In this case, it is "hello" .
+
+ANd save it. 
+
+Now for tenant, go to AZURE active directory > Properties > copy Directory ID value as this is TENANT_ID .
+
+and authorization details are completed. 
+
+Now run the ansible playbook.
+

@@ -1,0 +1,4 @@
+---
+ - hosts: localhost
+   tasks: 
+    - docker_container: name=myfirstcont1 image=centos6 ports=8888:80 interactive=yes state=started 

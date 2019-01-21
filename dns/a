@@ -1,0 +1,4 @@
+#!/bin/bash
+
+for i in `seq 10` ;  do ; echo "desk$i IN A 192.168.10.9$i" >>mdhackdb ; done
+

@@ -1,0 +1,68 @@
+---
+ - hosts: localhost
+   connection: local
+   tasks:
+    - name: Create resource group 
+      azure_rm_resourcegroup:
+       name: jaiho
+       location: eastus
+       
+    - name: Create virtual network 
+      azure_rm_virtualnetwork:
+       resource_group: jaiho
+       name: microsoft_vnet
+       address_prefixes_cidr: "10.0.0.0/16"
+
+    - name: Add subnet 
+      azure_rm_subnet: 
+       resource_group: jaiho
+       name: microsoft_subnet
+       address_prefix: "10.0.1.0/24"
+       virtual_network: microsoft_vnet
+       
+    - name: Create public IP address
+      azure_rm_publicipaddress:
+       resource_group: jaiho
+       allocation_method: Static
+       name: microsoft_public_ip
+      register: output_ip_address
+
+    - name: Dump public ip for which vm will be created 
+      debug: 
+       msg: "The public ip is {{ output_ip_address.state.ip_address }}"
+
+    - name: Create network security group that allows SSH
+      azure_rm_securitygroup:
+       resource_group: jaiho
+       name: microsoft_securitygroup
+       rules: 
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 1001
+          direction: Inbound
+
+    - name: Create virtual network Interface card
+      azure_rm_networkinterface:
+       resource_group: jaiho
+       name: nic
+       virtual_network: microsoft_vnet
+       subnet: microsoft_subnet
+       public_ip_name: microsoft_public_ip
+       security_group: microsoft_securitygroup
+
+    - name: Create VM
+      azure_rm_virtualmachine:
+       resource_group: jaiho
+       name: myvm
+       vm_size: Standard_DS1_v2
+       admin_username: azureuser
+       ssh_password_enabled: True
+       admin_password: Gaurav9950@!
+       network_interfaces: nic
+       image:
+        offer: CentOS
+        publisher: OpenLogic
+        sku: '7.5'
+        version: latest 

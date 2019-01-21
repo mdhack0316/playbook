@@ -1,0 +1,14 @@
+
+---
+- name: testing
+  hosts: localhost
+  vars_files:
+           - file1.yml
+           - file2.yml
+  tasks:
+    - name: testin
+      debug: msg="Hi there"
+
+
+
+...

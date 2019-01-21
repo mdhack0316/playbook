@@ -1,0 +1,64 @@
+--- 
+ - hosts: namenode
+   tasks: 
+    - yum: name={{ item }} state=present
+      with_items: 
+       - bash-completion
+       - vim*
+       - net-tools
+         #    - name: downloading jdk 
+         # shell: wget ftp://192.168.10.254/pub/ashutoshh/jdk-8u121-linux-x64.rpm
+      # - shell: rpm -ivh jdk-8u121-linux-x64.rpm
+      #  - shell: wget ftp://192.168.10.254/pub/adhoc/Apache_Hadoop/hadoop-2.7.3.tar.gz
+      # - shell: tar -xzvf hadoop-2.7.3.tar.gz
+      #  - shell: mv  hadoop-2.7.3  /hadoop2
+      # - copy: path=/root/.bashrc   dest=/root/.bashrc
+      # - shell: source /root/.bashrc
+    - copy: src=/root/playbooks/bigdata/core-site.xml   dest=/hadoop2/etc/hadoop/ 
+    - copy: src=/root/playbooks/bigdata/hadoop-env.sh   dest=/hadoop2/etc/hadoop/
+    - copy: src=/root/playbooks/bigdata/hdfs-site.xml   dest=/hadoop2/etc/hadoop/
+    - shell: hdfs namenode -format 
+    - shell: hadoop-daemon.sh start namenode 
+  
+ - hosts: dn1
+   tasks: 
+    - yum: name={{ item }} state=present
+      with_items: 
+       - bash-completion 
+       - vim*
+       - net-tools
+         # - name: downloading jdk 
+         #shell: wget ftp://192.168.10.254/pub/ashutoshh/jdk-8u121-linux-x64.rpm
+         #    - shell: rpm -ivh jdk-8u121-linux-x64.rpm
+         #    - shell: wget ftp://192.168.10.254/pub/adhoc/Apache_Hadoop/hadoop-2.7.3.tar.gz
+    
+    #- shell: tar -xzvf hadoop-2.7.3.tar.gz
+    # - shell: mv  hadoop-2.7.3  /hadoop2
+    # - copy: path=/root/.bashrc   dest=/root/.bashrc
+    # - shell: source /root/.bashrc
+    - copy: src=/root/playbooks/bigdata/core-site.xml   dest=/hadoop2/etc/hadoop/ 
+    - copy: src=/root/playbooks/bigdata/hadoop-env.sh   dest=/hadoop2/etc/hadoop/ 
+    - copy: src=/root/playbooks/bigdata/hdfs-site1.xml   dest=/hadoop2/etc/hadoop/hdfs-site.yml
+    - shell: hadoop-daemon.sh start datanode 
+
+
+
+ - hosts: dn2
+   tasks: 
+    - yum: name={{ item }} state=present 
+      with_items: 
+       - bash-completion 
+       - vim*
+       - net-tools
+         # - name: downloading jdk 
+         #  shell: wget ftp://192.168.10.254/pub/ashutoshh/jdk-8u121-linux-x64.rpm
+         #  - shell: rpm -ivh jdk-8u121-linux-x64.rpm
+         #   - shell: wget ftp://192.168.10.254/pub/adhoc/Apache_Hadoop/hadoop-2.7.3.tar.gz
+         #  - shell: tar -xzvf hadoop-2.7.3.tar.gz
+         #  - shell: mv  hadoop-2.7.3  /hadoop2
+         #    - copy: path=/root/.bashrc   dest=/root/.bashrc
+         #- shell: source /root/.bashrc
+    - copy: src=/root/playbooks/bigdata/core-site.xml   dest=/hadoop2/etc/hadoop/
+    - copy: src=/root/playbooks/bigdata/hadoop-env.sh   dest=/hadoop2/etc/hadoop/
+    - copy: src=/root/playbooks/bigdata/hdfs-site2.xml   dest=/hadoop2/etc/hadoop/hdfs-site.yml
+    - shell: hadoop-daemon.sh start datanode 

@@ -1,0 +1,45 @@
+---
+- hosts: localhost
+  connection: local
+  vars_prompt:
+  - name: "rootpassword"
+    prompt: root
+    private: yes
+  tasks:
+  - vsphere_guest:
+      vcenter_hostname: station31.example.com
+      username: root
+      password: 123qwe,./
+      guest: newvm004
+      state: powered_on
+      vm_extra_config:
+        vcpu.hotadd: yes
+        mem.hotadd:  yes
+        notes: This is a test VM
+      validate_certs: false 
+      vm_disk:
+        disk1:
+          size_gb: 10
+          type: thin
+          datastore: datastore1
+          # VMs can be put into folders. The value given here is either the full path
+          # to the folder (e.g. production/customerA/lamp) or just the last component
+          # of the path (e.g. lamp):
+          folder: DARK_LAB/10_DMZ
+      vm_nic:
+        nic1:
+          type: vmxnet3
+          network: DMZ
+          network_type: standard
+      vm_hardware:
+        memory_mb: 3048
+        num_cpus: 2
+        osid: centos64Guest
+        scsi: paravirtual
+        vm_cdrom:
+          type: "iso"
+          iso_path: "datastore1/ISO/ubuntu-16.04-desktop-amd64.iso"
+      esxi:
+        datacenter: ha-datacenter
+        hostname: station31.example.com
+

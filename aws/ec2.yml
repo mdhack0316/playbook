@@ -1,0 +1,26 @@
+---
+ - hosts: localhost
+   connection: local
+   remote_user: root
+   gather_facts: True
+   vars_files:
+    - ec2pass.yml
+   tasks: 
+    - name: Provision a set of instances 
+      ec2:
+       aws_access_key: "{{ec2_access_key}}"
+       aws_secret_key: "{{ec2_secret_key}}" 
+       key_name: instance
+       group: launch-wizard-5
+       region: ap-south-1
+       instance_type: t2.micro 
+       image: ami-5b673c34
+       exact_count: 2
+       count_tag:
+        Name: Demo
+       wait: true
+       monitoring: no 
+       vpc_subnet_id: subnet-2753354f
+       assign_public_ip: yes
+      register: ec2 
+       

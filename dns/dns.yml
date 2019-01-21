@@ -1,0 +1,15 @@
+---
+ - hosts: dns
+   tasks: 
+    - name: installing packages
+      yum: name=bind state=present
+    - shell: cp /var/named/named.localhost  /var/named/mdhackdb
+    - shell: mv  /etc/named.conf /etc/named.conf.back
+  # - file: path=/etc/named.conf state=touch 
+    - copy: src=named.conf dest=/etc/ 
+    - lineinfile: path=/var/named/mdhackdb  line=@       NS    dns.mdhack.com. backup=yes
+    - lineinfile: path=/var/named/mdhackdb line=dns.mdhack.com. A 192.168.10.66
+    - lineinfile: path=/var/named/mdhackdb line=lab.mdhack.com. A 192.168.10.66
+    - shell: for i in `seq 10` ;  do ; echo "desk$i IN A 192.168.10.9$i" >>mdhackdb ; done
+    - shell: chown named:named /var/named/mdhackdb
+    - service: name=named state=restarted enabled=yes
