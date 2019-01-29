@@ -1,0 +1,25 @@
+--- 
+ - hosts: localhost
+   tasks: 
+    - yum: name={{ item }} state=present
+      with_items: 
+       - net-tools
+       - vim*
+       - bash-completion 
+       - kubelet
+       - kubectl 
+       - kubeadm
+    - shell: setenforce 0
+    - shell: sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config    - shell: systemctl enable firewalld
+    - shell: systemctl start firewalld
+    - shell: firewall-cmd --add-port=0-65535/tcp --permanent 
+    - shell: firewall-cmd --add-port=0-65535/udp --permanent 
+    - shell: firewall-cmd --reload
+    - shell: swapoff -a
+    - shell: modprobe br_netfilter
+    - shell: echo  net.bridge.bridge-nf-call-ip6tables = 1 >>/etc/sysctl.conf
+    - shell: echo net.bridge.bridge-nf-call-iptables = 1 >>/etc/sysctl.conf
+    - shell: echo net_forward_ip.forward = 1 >>/etc/sysctl.conf
+    - shell: sysctl -p 
+    - service: name=docker state=started enabled=yes
+    - service: name=kubelet enabled=yes
